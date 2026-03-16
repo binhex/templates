@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<Container version="2">
+    <Name>binhex-qbittorrent</Name>
+	<Beta>false</Beta>
+    <Category>Downloaders:</Category>
+    <Repository>ghcr.io/binhex/arch-qbittorrent</Repository>
+    <Registry>https://github.com/binhex/arch-qbittorrent/pkgs/container/arch-qbittorrent</Registry>
+    <Network>bridge</Network>
+    <Privileged>true</Privileged>
+    <PrivilegedReq>false</PrivilegedReq>
+    <ExtraParams>--restart=always</ExtraParams>
+    <Shell>bash</Shell>
+    <GitHub>https://github.com/binhex/arch-qbittorrent</GitHub>
+    <ReadMe>https://github.com/binhex/documentation</ReadMe>
+    <Support>https://forums.unraid.net/topic/192161-support-binhex-qbittorrent/</Support>
+    <Project>https://www.qbittorrent.org/</Project>
+    <Overview>qBittorrent is a bittorrent client programmed in C++ / Qt that uses libtorrent (sometimes called libtorrent-rasterbar) by Arvid Norberg. It aims to be a good alternative to all other bittorrent clients out there. qBittorrent is fast, stable and provides unicode support as well as many features.</Overview>
+    <WebUI>http://[IP]:[PORT:8080]</WebUI>
+    <TemplateURL>https://raw.githubusercontent.com/binhex/docker-templates/master/binhex/qbittorrent.xml</TemplateURL>
+    <Icon>https://raw.githubusercontent.com/binhex/docker-templates/master/binhex/images/qbittorrent-icon.png</Icon>
+    <DonateText>If you appreciate my work, then please consider buying me a beer :D</DonateText>
+    <DonateLink>https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=MM5E27UX6AUU4</DonateLink>
+    <DonateImg>https://www.paypal.com/en_US/i/btn/btn_donate_SM.gif</DonateImg>
+    <Date>1970-01-01</Date>
+    <Changes></Changes>
+    <Config Name="Port: Web Interface" Target="8080" Default="8080" Mode="tcp" Description="This is the port for the Web UI for the application." Type="Port" Display="always" Required="true" Mask="false"/>
+    <Config Name="Port: Incoming port TCP" Target="58946" Default="58946" Mode="tcp" Description="This is the TCP incoming port when VPN_ENABLED is set to 'no'." Type="Port" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Port: Incoming port UDP" Target="58946" Default="58946" Mode="udp" Description="This is the UDP incoming port when VPN_ENABLED is set to 'no'." Type="Port" Display="advanced" Required="false" Mask="false"/>
+
+    <Config Name="Path: /config" Target="/config" Default="/mnt/user/appdata/qbittorrent" Mode="rw" Description="This is the container path to your configuration files, e.g. databases, configuration files, logs etc." Type="Path" Display="always" Required="true" Mask="false"/>
+	<Config Name="Path: /data" Target="/data" Default="" Mode="rw" Description="This is the container path to your downloaded files or user created content." Type="Path" Display="always" Required="true" Mask="false"/>
+
+    <Config Name="Variable: GLUETUN_INCOMING_PORT" Target="GLUETUN_INCOMING_PORT" Default="no|yes" Description="Specify whether to attempt to identify and configure the applications listening port when connected to the gluetun network." Type="Variable" Display="always" Required="false" Mask="false"/>
+    <Config Name="Variable: GLUETUN_CONTROL_SERVER_PORT" Target="GLUETUN_CONTROL_SERVER_PORT" Default="8000" Description="Specify the port for the gluetun HTTP Control Server." Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Variable: GLUETUN_CONTROL_SERVER_USERNAME" Target="GLUETUN_CONTROL_SERVER_USERNAME" Default="controlserver" Description="Specify the username for the gluetun HTTP Control Server" Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Variable: GLUETUN_CONTROL_SERVER_PASSWORD" Target="GLUETUN_CONTROL_SERVER_PASSWORD" Default="controlserver" Description="Specify the password for the gluetun HTTP Control Server" Type="Variable" Display="advanced" Required="false" Mask="true"/>
+	<Config Name="Variable: WEBUI_PORT" Target="WEBUI_PORT" Default="8080" Description="Specify the port the application will listen on - IMPORTANT: If you change this value then you will also need to delete and re-create the port mapping to match." Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Variable: DEBUG" Target="DEBUG" Default="no|yes" Description="Specify whether you want to enable debug logging, useful when diagnosing gluetune related issues." Type="Variable" Display="advanced" Required="true" Mask="false"/>
+    <Config Name="Variable: ENABLE_HEALTHCHECK" Target="ENABLE_HEALTHCHECK" Default="yes|no" Description="Enable or disable healthchecks." Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Variable: HEALTHCHECK_COMMAND" Target="HEALTHCHECK_COMMAND" Default="" Description="The command or script to execute, if not specified then the script healthcheck.sh will be used (process, dns and https checking)." Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Variable: HEALTHCHECK_ACTION" Target="HEALTHCHECK_ACTION" Default="" Description="The action to execute if the healthcheck command returns a non zero exit code, if not specified the action will be 'exit 1', if you want the container to exit on failure then set the action to 'kill 1'." Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Variable: HEALTHCHECK_HOSTNAME" Target="HEALTHCHECK_HOSTNAME" Default="google.com" Description="The hostname used when performing HTTPS and DNS healthchecking." Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Variable: PUID" Target="PUID" Default="99" Description="User ID for the running container." Type="Variable" Display="advanced" Required="true" Mask="false"/>
+    <Config Name="Variable: PGID" Target="PGID" Default="100" Description="Group ID for the running container." Type="Variable" Display="advanced" Required="true" Mask="false"/>
+    <Config Name="Variable: UMASK" Target="UMASK" Default="000" Description="UMASK for the running container." Type="Variable" Display="advanced" Required="true" Mask="false"/>
+</Container>

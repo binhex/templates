@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<Container version="2">
+    <Name>binhex-bitmagnet</Name>
+	<Beta>false</Beta>
+    <Category>Downloaders: MediaApp:Video</Category>
+    <Repository>ghcr.io/binhex/arch-bitmagnet</Repository>
+    <Registry>https://github.com/binhex/arch-bitmagnet/pkgs/container/arch-bitmagnet</Registry>
+    <Network>bridge</Network>
+    <Privileged>false</Privileged>
+    <PrivilegedReq>false</PrivilegedReq>
+    <ExtraParams>--restart=always</ExtraParams>
+    <Shell>bash</Shell>
+    <GitHub>https://github.com/binhex/arch-bitmagnet</GitHub>
+    <ReadMe>https://github.com/binhex/documentation</ReadMe>
+    <Support>https://forums.unraid.net/topic/174999-support-binhex-bitmagnet</Support>
+    <Project>https://github.com/bitmagnet-io/bitmagnet</Project>
+    <Overview>A self-hosted BitTorrent indexer, DHT crawler, content classifier and torrent search engine with web UI, GraphQL API and Servarr stack integration.</Overview>
+    <WebUI>http://[IP]:[PORT:3333]</WebUI>
+    <TemplateURL>https://raw.githubusercontent.com/binhex/docker-templates/master/binhex/bitmagnet.xml</TemplateURL>
+    <Icon>https://raw.githubusercontent.com/binhex/docker-templates/master/binhex/images/bitmagnet-icon.png</Icon>
+    <DonateText>If you appreciate my work, then please consider buying me a beer :D</DonateText>
+    <DonateLink>https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=MM5E27UX6AUU4</DonateLink>
+    <DonateImg>https://www.paypal.com/en_US/i/btn/btn_donate_SM.gif</DonateImg>
+    <Date>1970-01-01</Date>
+    <Changes></Changes>
+    <Config Name="Port: Web Interface" Target="3333" Default="3333" Mode="tcp" Description="This is the Web UI port for the application." Type="Port" Display="always" Required="true" Mask="false"/>
+    <Config Name="Port: Bittorrent TCP" Target="3344" Default="3344" Mode="tcp" Description="This is the bittorrent TCP port used by the application." Type="Port" Display="always" Required="true" Mask="false"/>
+    <Config Name="Port: Bittorrent UDP" Target="3344" Default="3344" Mode="udp" Description="This is the bittorrent UDP port used by the application." Type="Port" Display="always" Required="true" Mask="false"/>
+    <Config Name="Port: Postgres" Target="5432" Default="5432" Mode="tcp" Description="This is the port for Postgres, this is optional." Type="Port" Display="always" Required="false" Mask="false"/>
+
+    <Config Name="Path: /config" Target="/config" Default="/mnt/user/appdata/bitmagnet" Mode="rw" Description="This is the container path to your configuration files, e.g. databases, configuration files, logs etc." Type="Path" Display="always" Required="true" Mask="false"/>
+
+    <Config Name="Variable: POSTGRES_BACKUP_DB" Target="POSTGRES_BACKUP_DB" Default="false|true" Description="Enable or disable automatic database backup on container start." Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Variable: POSTGRES_BACKUP_RETENTION_DAYS" Target="POSTGRES_BACKUP_RETENTION_DAYS" Default="7" Description="Number of days to retain database backups. Older backups will be automatically deleted." Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Variable: POSTGRES_SCHEDULED_BACKUP" Target="POSTGRES_SCHEDULED_BACKUP" Default="false|true" Description="Enable or disable scheduled database backups." Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Variable: POSTGRES_SCHEDULED_BACKUP_INTERVAL_HOURS" Target="POSTGRES_SCHEDULED_BACKUP_INTERVAL_HOURS" Default="48" Description="Interval in hours between scheduled database backups." Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Variable: POSTGRES_RESTORE_DB" Target="POSTGRES_RESTORE_DB" Default="false|true" Description="Enable or disable database restore on container start. This will drop and recreate the database." Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Variable: POSTGRES_RESTORE_PATH" Target="POSTGRES_RESTORE_PATH" Default="" Description="Path to backup directory to restore from, e.g. '/config/bitmagnet/backups/bitmagnet_20251218_174202'. If not specified, the latest backup will be used." Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Variable: POSTGRES_VACUUM_DB" Target="POSTGRES_VACUUM_DB" Default="false|true" Description="Enable or disable database vacuuming for BitMagnet." Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Variable: POSTGRES_REINDEX_DB" Target="POSTGRES_REINDEX_DB" Default="false|true" Description="Enable or disable database reindexing for BitMagnet." Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Variable: TMDB_API_KEY" Target="TMDB_API_KEY" Default="" Description="Specify your TMDB API key, if you do not specify your own key then a default key will be used which may result in slower indexing due to rate limiting." Type="Variable" Display="always" Required="true" Mask="false"/>
+    <Config Name="Variable: PROCESSOR_CONCURRENCY" Target="PROCESSOR_CONCURRENCY" Default="1" Description="Defines the maximum number of torrents to be processed/classified simultaneously. The default setting of 1 aims to support the widest range of systems. Increasing the setting (for example to 3) may improve throughput of the processor queue but is known to cause slowdowns on less powerful systems." Type="Variable" Display="always" Required="false" Mask="false"/>
+    <Config Name="Variable: ENABLE_HEALTHCHECK" Target="ENABLE_HEALTHCHECK" Default="yes|no" Description="Enable or disable healthchecks." Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Variable: HEALTHCHECK_COMMAND" Target="HEALTHCHECK_COMMAND" Default="" Description="The command or script to execute, if not specified then the script healthcheck.sh will be used (process, dns and https checking)." Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Variable: HEALTHCHECK_ACTION" Target="HEALTHCHECK_ACTION" Default="" Description="The action to execute if the healthcheck command returns a non zero exit code, if not specified the action will be 'exit 1', if you want the container to exit on failure then set the action to 'kill 1'." Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Variable: HEALTHCHECK_HOSTNAME" Target="HEALTHCHECK_HOSTNAME" Default="google.com" Description="The hostname used when performing HTTPS and DNS healthchecking." Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Variable: PUID" Target="PUID" Default="99" Description="User ID for the running container" Type="Variable" Display="advanced" Required="true" Mask="false"/>
+    <Config Name="Variable: PGID" Target="PGID" Default="100" Description="Group ID for the running container" Type="Variable" Display="advanced" Required="true" Mask="false"/>
+    <Config Name="Variable: UMASK" Target="UMASK" Default="000" Description="UMASK for the running container" Type="Variable" Display="advanced" Required="true" Mask="false"/>
+</Container>
