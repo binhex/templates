@@ -10,6 +10,9 @@
 # ignore vscode ide
 .vscode
 
+# ignore test coverage files
+.coverage
+
 # ignore compiled python scripts
 *.py[cod]
 

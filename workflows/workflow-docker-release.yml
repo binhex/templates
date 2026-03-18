@@ -1,0 +1,533 @@
+name: workflow-docker-release
+
+on:
+  workflow_call:
+    inputs:
+      tags:
+        required: true
+        type: string
+      platforms:
+        required: false
+        type: string
+        default: 'linux/amd64'
+      checkout_ref:
+        required: false
+        type: string
+        default: ''
+    secrets:
+      CR_PAT:
+        required: true
+      DOCKERHUB_PASSWORD:
+        required: true
+      DOCKERHUB_TOKEN:
+        required: true
+      DOCKERHUB_USERNAME:
+        required: true
+      EMAIL_ADDRESS:
+        required: true
+      EMAIL_PASSWORD:
+        required: true
+      IMMORTALITY_PAT:
+        required: true
+      QUAY_TOKEN:
+        required: true
+      QUAY_USERNAME:
+        required: true
+      TDB_PAT:
+        required: true
+
+env:
+  REGISTRY_IMAGE: ${{ github.repository }}
+
+jobs:
+  # build amd64 image and run tests
+  build-amd64-test:
+    runs-on: ubuntu-latest
+
+    # create outputs for use in other jobs
+    outputs:
+      app_name: ${{ steps.generate_app_name.outputs.app_name }}
+      release_tag: ${{ steps.identify_github_release_tag_name.outputs.release_tag }}
+      tag_name_full_version: ${{ steps.generate_registry_tag_names.outputs.tag_name_full_version }}
+      tag_name_major_version: ${{ steps.generate_registry_tag_names.outputs.tag_name_major_version }}
+      tag_name_major_minor_version: ${{ steps.generate_registry_tag_names.outputs.tag_name_major_minor_version }}
+      tag_name_latest_version: ${{ steps.generate_registry_tag_names.outputs.tag_name_latest_version }}
+      random_digest_name: ${{ steps.generate_random_digest_name.outputs.random_digest_name }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.checkout_ref || github.ref }}
+
+      - name: Set up QEMU for multi-arch support
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY_IMAGE }}
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          registry: docker.io
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Login to GitHub
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.CR_PAT }}
+
+      - name: Login to Quay
+        uses: docker/login-action@v3
+        with:
+          registry: quay.io
+          username: ${{ secrets.QUAY_USERNAME }}
+          password: ${{ secrets.QUAY_TOKEN }}
+
+      - name: Sync GitHub README.md with Docker Hub
+        uses: peter-evans/dockerhub-description@v4
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }} # NOTE: This MUST be the password NOT the token
+          repository: ${{ github.repository }}
+          short-description: ${{ github.event.repository.description }}
+
+      - name: DEBUG Show Runners environment
+        shell: bash
+        run: |
+            export
+
+      - name: Identify GitHub Release tag name
+        id: identify_github_release_tag_name
+        # get tag name from runners environment 'GITHUB_REF_NAME' and then use bash substring
+        # to strip out '+' symbol - required due to gcr not supporting this as a tag
+        # name (docker hub does support it).
+        # note if push is NOT triggered by tag then 'GITHUB_REF_NAME' will be the branch name.
+        shell: bash
+        run: |
+            github_ref_name="${GITHUB_REF_NAME}"
+            release_tag="${github_ref_name//+/-}"
+            echo "[debug] Generated tag name is '${release_tag}'"
+            echo "release_tag=${release_tag}" >> $GITHUB_OUTPUT
+
+      - name: Generate temporary tag name
+        id: generate_temporary_tag_name
+        shell: bash
+        run: |
+          test_tag=$(date +%Y%m%d%H%M%S)
+          echo "[debug] Generated test tag name is '${test_tag}'"
+          echo "test_tag=$test_tag" >> $GITHUB_OUTPUT
+
+      - name: Generate random digest name
+        id: generate_random_digest_name
+        run: |
+          random_digest_name=$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c 13)
+          echo "[debug] Generated random digest name is '${random_digest_name}'"
+          echo "random_digest_name=${random_digest_name}" >> $GITHUB_OUTPUT
+
+      - name: Generate app name
+        id: generate_app_name
+        shell: bash
+        run: |
+          app_name=$(echo "${GITHUB_REPOSITORY}" | grep -P -o -m 1 '(?<=/arch-).*')
+          echo "[debug] Generated app name is '${app_name}'"
+          echo "app_name=$app_name" >> $GITHUB_OUTPUT
+
+      - name: Generate major and major-minor version tag names
+        id: generate_version_tags
+        shell: bash
+        run: |
+          # Get release tag name
+          release_version="${{ steps.identify_github_release_tag_name.outputs.release_tag }}"
+
+          # capture full release tag name
+          echo "release_version=${release_version}" >> $GITHUB_OUTPUT
+
+          # Validate and construct major and major-minor versions
+          if [[ "${release_version}" =~ ^(v?[0-9]+)\.([0-9]+)\.[0-9]+ ]]; then
+            major_version="${BASH_REMATCH[1]}"
+            minor_version="${BASH_REMATCH[2]}"
+            major_minor_version="${major_version}.${minor_version}"
+            echo "[debug] Constructed major version tag name: ${major_version}"
+            echo "[debug] Constructed major-minor version tag name: ${major_minor_version}"
+            echo "major_version=${major_version}" >> $GITHUB_OUTPUT
+            echo "major_minor_version=${major_minor_version}" >> $GITHUB_OUTPUT
+          else
+            echo "[warn] Release tag '${release_version}' does not include 3 or more octets, major and major-minor version tag names not constructed."
+            echo "major_version=" >> $GITHUB_OUTPUT
+            echo "major_minor_version=" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Generate registry tag names
+        id: generate_registry_tag_names
+        shell: bash
+        run: |
+          # get current branch name
+          # note do NOT use GITHUB_REF here as it may contain the tag name NOT the branch name
+          git_branch_name="$(git branch --show-current)"
+          echo "[debug] Git branch name is '${git_branch_name}'"
+
+          # identify branch name, used as suffix for tag names if not main/master and not empty
+          if [[ "${git_branch_name}" != "main" && "${git_branch_name}" != "master" && -n "${git_branch_name}" ]]; then
+            branch_suffix="-${git_branch_name}"
+          else
+            branch_suffix=""
+          fi
+
+          # construct tag name versions, used in merge-push job
+          tag_name_full_version="${{ steps.generate_version_tags.outputs.release_version }}${branch_suffix}"
+          tag_name_major_version="${{ steps.generate_version_tags.outputs.major_version }}${branch_suffix}"
+          tag_name_major_minor_version="${{ steps.generate_version_tags.outputs.major_minor_version }}${branch_suffix}"
+          tag_name_latest_version="latest${branch_suffix}"
+
+          echo "[debug] Constructed tag name full version: ${tag_name_full_version}"
+          echo "[debug] Constructed tag name major version: ${tag_name_major_version}"
+          echo "[debug] Constructed tag name major-minor version: ${tag_name_major_minor_version}"
+          echo "[debug] Constructed tag name latest version: ${tag_name_latest_version}"
+
+          # Define registries
+          registries=(
+            "docker.io/${{ github.repository }}"
+            "quay.io/${{ github.repository }}"
+            "ghcr.io/${{ github.repository }}"
+          )
+
+          # Construct registry tag names, used when pushing a single arch image
+          registry_tag_names=""
+          for registry in "${registries[@]}"; do
+            registry_tag_names+="${registry}:${tag_name_full_version}, ${registry}:${tag_name_latest_version}, "
+
+            if [[ -n "${tag_name_major_version}" ]]; then
+              registry_tag_names+="${registry}:${tag_name_major_version}, "
+            fi
+            if [[ -n "${tag_name_major_minor_version}" ]]; then
+              registry_tag_names+="${registry}:${tag_name_major_minor_version}, "
+            fi
+          done
+
+          # Remove trailing space(s) and comma(s)
+          registry_tag_names_no_trailing_spaces="${registry_tag_names%"${registry_tag_names##*[![:space:]]}"}"
+          registry_tag_names_no_trailing_commas="${registry_tag_names_no_trailing_spaces%"${registry_tag_names_no_trailing_spaces##*[!,]}"}"
+          registry_tag_names="${registry_tag_names_no_trailing_commas}"
+
+          echo "[debug] Constructed registry tag names: ${registry_tag_names}"
+
+          # append to github output for use in subsequent jobs
+          echo "tag_name_full_version=${tag_name_full_version}" >> $GITHUB_OUTPUT
+          echo "tag_name_major_version=${tag_name_major_version}" >> $GITHUB_OUTPUT
+          echo "tag_name_major_minor_version=${tag_name_major_minor_version}" >> $GITHUB_OUTPUT
+          echo "tag_name_latest_version=${tag_name_latest_version}" >> $GITHUB_OUTPUT
+          echo "registry_tag_names=${registry_tag_names}" >> $GITHUB_OUTPUT
+
+      - name: Remove unnecessary directories to free up space
+        run: |
+          sudo rm -rf /usr/local/.ghcup
+          sudo rm -rf /opt/hostedtoolcache/CodeQL
+          sudo rm -rf /usr/local/lib/android/sdk/ndk
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /opt/ghc
+          sudo rm -rf /usr/local/share/boost
+
+      - name: Build amd64 image for testing
+        id: build-amd64-test
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/amd64
+          load: true
+          tags: ghcr.io/${{ github.repository }}:${{ steps.generate_temporary_tag_name.outputs.test_tag }}
+          build-args: |
+            RELEASETAG=${{ steps.identify_github_release_tag_name.outputs.release_tag }}
+            APPNAME=${{ steps.generate_app_name.outputs.app_name }}
+
+      - name: Run tests using previously built image
+        shell: bash
+        run: |
+          git_clone_scripts_dest="/tmp/scripts"
+          git_clone_scripts_repo="https://github.com/binhex/scripts.git"
+          git clone "${git_clone_scripts_repo}" "${git_clone_scripts_dest}"
+          "${git_clone_scripts_dest}/scripts/docker/testrunner.sh" --app-name ${{ steps.generate_app_name.outputs.app_name }} --image-name "ghcr.io/${{ github.repository }}:${{ steps.generate_temporary_tag_name.outputs.test_tag }}"
+
+      - name: Build and push amd64 images by tag (single arch)
+        id: build-final-amd64-only
+        if: ${{ !contains(inputs.platforms, 'linux/arm64') }}
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/amd64
+          push: true
+          tags: ${{ steps.generate_registry_tag_names.outputs.registry_tag_names }}
+          build-args: |
+            RELEASETAG=${{ steps.identify_github_release_tag_name.outputs.release_tag }}
+            APPNAME=${{ steps.generate_app_name.outputs.app_name }}
+
+      - name: Build and push amd64 images by digest (multi arch)
+        id: build-amd64-digest
+        if: contains(inputs.platforms, 'linux/arm64')
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/amd64
+          labels: ${{ steps.meta.outputs.labels }}
+          # note do NOT specify the tag name here, only repo name, you are pushing by digest not tag
+          tags: ${{ github.repository }}
+          outputs: |
+            type=image,name=docker.io/${{ github.repository }},push-by-digest=true,name-canonical=true,push=true
+            type=image,name=ghcr.io/${{ github.repository }},push-by-digest=true,name-canonical=true,push=true
+            type=image,name=quay.io/${{ github.repository }},push-by-digest=true,name-canonical=true,push=true
+          build-args: |
+            RELEASETAG=${{ steps.identify_github_release_tag_name.outputs.release_tag }}
+            APPNAME=${{ steps.generate_app_name.outputs.app_name }}
+
+      - name: Export amd64 digest (multi arch)
+        if: contains(inputs.platforms, 'linux/arm64')
+        run: |
+          mkdir -p ${{ runner.temp }}/digests
+          digest="${{ steps.build-amd64-digest.outputs.digest }}"
+          touch "${{ runner.temp }}/digests/${digest#sha256:}"
+
+      - name: Upload amd64 digest (multi arch)
+        if: contains(inputs.platforms, 'linux/arm64')
+        uses: actions/upload-artifact@v4
+        with:
+          name: digests-amd64-${{ inputs.tags }}-${{ github.run_id }}-${{ github.run_attempt }}-${{ steps.generate_random_digest_name.outputs.random_digest_name }}
+          path: ${{ runner.temp }}/digests/*
+          if-no-files-found: error
+          retention-days: 1
+
+  # Build arm64 image
+  build-arm64:
+    runs-on: ubuntu-24.04-arm
+    needs: build-amd64-test
+    if: contains(inputs.platforms, 'linux/arm64')
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.checkout_ref || github.ref }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          registry: docker.io
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Login to GitHub
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.CR_PAT }}
+
+      - name: Login to Quay
+        uses: docker/login-action@v3
+        with:
+          registry: quay.io
+          username: ${{ secrets.QUAY_USERNAME }}
+          password: ${{ secrets.QUAY_TOKEN }}
+
+      - name: Build and push arm64 images by digest (multi arch)
+        id: build-arm64
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/arm64
+          labels: ${{ needs.meta.outputs.labels }}
+          # note do NOT specify the tag name here, only the repo name, you are pushing by digest not tag
+          tags: ${{ github.repository }}
+          outputs: |
+            type=image,name=docker.io/${{ github.repository }},push-by-digest=true,name-canonical=true,push=true
+            type=image,name=ghcr.io/${{ github.repository }},push-by-digest=true,name-canonical=true,push=true
+            type=image,name=quay.io/${{ github.repository }},push-by-digest=true,name-canonical=true,push=true
+          build-args: |
+            RELEASETAG=${{ needs.build-amd64-test.outputs.release_tag }}
+            APPNAME=${{ needs.build-amd64-test.outputs.app_name }}
+
+      - name: Export arm64 digest (multi arch)
+        run: |
+          mkdir -p ${{ runner.temp }}/digests
+          digest="${{ steps.build-arm64.outputs.digest }}"
+          touch "${{ runner.temp }}/digests/${digest#sha256:}"
+
+      - name: Upload arm64 digest (multi arch)
+        uses: actions/upload-artifact@v4
+        with:
+          name: digests-arm64-${{ inputs.tags }}-${{ github.run_id }}-${{ github.run_attempt }}-${{ needs.build-amd64-test.outputs.random_digest_name }}
+          path: ${{ runner.temp }}/digests/*
+          if-no-files-found: error
+          retention-days: 1
+
+  # merge manifests and push final multi-arch image
+  merge-push:
+    runs-on: ubuntu-latest
+    needs:
+      - build-arm64
+      - build-amd64-test
+    if: contains(inputs.platforms, 'linux/arm64') && always() && needs.build-amd64-test.result == 'success'
+    steps:
+      - name: Download digests
+        uses: actions/download-artifact@v4
+        with:
+          path: ${{ runner.temp }}/digests
+          pattern: digests-*-${{ inputs.tags }}-${{ github.run_id }}-${{ github.run_attempt }}-${{ needs.build-amd64-test.outputs.random_digest_name }}
+          merge-multiple: true
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          registry: docker.io
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Login to GitHub
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.CR_PAT }}
+
+      - name: Login to Quay
+        uses: docker/login-action@v3
+        with:
+          registry: quay.io
+          username: ${{ secrets.QUAY_USERNAME }}
+          password: ${{ secrets.QUAY_TOKEN }}
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          # note 'images' format is <registry>/<owner>/<image name>
+          images: |
+            docker.io/${{ github.repository }}
+            quay.io/${{ github.repository }}
+            ghcr.io/${{ github.repository }}
+          # note key name 'value' must be set to this for type raw
+          # note we are using 'raw' type not 'semver', as not all release versions follow semver
+          tags: |
+            type=raw,value=${{ needs.build-amd64-test.outputs.tag_name_full_version }}
+            type=raw,value=${{ needs.build-amd64-test.outputs.tag_name_major_version }}
+            type=raw,value=${{ needs.build-amd64-test.outputs.tag_name_major_minor_version }}
+            type=raw,value=${{ needs.build-amd64-test.outputs.tag_name_latest_version }}
+
+      - name: Create manifest list and push
+        working-directory: ${{ runner.temp }}/digests
+        run: |
+          echo "[debug] Displaying Docker metadata output json: '${DOCKER_METADATA_OUTPUT_JSON}'"
+
+          # Function to create a single tag with retry logic
+          create_tag_with_retry() {
+            local tag="$1"
+            shift  # Remove the first argument (tag), rest are sources
+            local sources=("$@")  # All remaining arguments are sources
+            local max_retries=5
+            local retry_count=0
+            local base_delay=2
+            local timeout_seconds=300  # 5 minute timeout per attempt
+
+            while [[ ${retry_count} -lt ${max_retries} ]]; do
+              echo "[info] Creating tag: ${tag} (attempt $((retry_count + 1))/${max_retries}) [timeout: ${timeout_seconds}s]"
+
+              # Use timeout to prevent hanging, capture both stdout and stderr
+              if output=$(timeout ${timeout_seconds} docker buildx imagetools create -t "${tag}" "${sources[@]}" 2>&1); then
+                echo "[success] Created tag: ${tag}"
+                return 0
+              else
+                local exit_code=$?
+                echo "[error] Failed to create tag: ${tag}"
+                echo "[debug] Error output: ${output}"
+                echo "[debug] Exit code: ${exit_code}"
+
+                # Check if command timed out (exit code 124)
+                if [[ ${exit_code} -eq 124 ]]; then
+                  echo "[warn] Command timed out after ${timeout_seconds} seconds. Retrying..."
+                  delay=$((base_delay * (2 ** retry_count)))
+                  sleep "${delay}"
+                # Check if it's a 429 error and extract retry-after
+                elif echo "${output}" | grep -q "429 Too Many Requests"; then
+                  retry_after_ms=$(echo "${output}" | grep -o 'retry-after: [0-9.]*ms' | grep -o '[0-9.]*' || echo "")
+                  if [[ -n "${retry_after_ms}" ]]; then
+                    # Convert milliseconds to seconds (round up)
+                    retry_after_seconds=$(echo "scale=0; (${retry_after_ms} + 999) / 1000" | bc -l)
+                    echo "[info] Rate limited. Waiting ${retry_after_seconds} seconds as requested by server..."
+                    sleep "${retry_after_seconds}"
+                  else
+                    # Exponential backoff if no retry-after header
+                    delay=$((base_delay * (2 ** retry_count)))
+                    echo "[info] Rate limited. Using exponential backoff: ${delay} seconds..."
+                    sleep "${delay}"
+                  fi
+                else
+                  # Non-429 error, use exponential backoff
+                  delay=$((base_delay * (2 ** retry_count)))
+                  echo "[warn] Non-rate-limit error. Retrying in ${delay} seconds..."
+                  sleep "${delay}"
+                fi
+
+                retry_count=$((retry_count + 1))
+              fi
+            done
+
+            echo "[error] Failed to create tag after ${max_retries} attempts: ${tag}"
+            return 1
+          }
+
+          # Extract tags as arrays
+          dockerhub_tags_array=($(jq -cr '.tags | map(select(startswith("docker.io/"))) | .[]' <<< "$DOCKER_METADATA_OUTPUT_JSON"))
+          ghcr_tags_array=($(jq -cr '.tags | map(select(startswith("ghcr.io/"))) | .[]' <<< "$DOCKER_METADATA_OUTPUT_JSON"))
+          quay_tags_array=($(jq -cr '.tags | map(select(startswith("quay.io/"))) | .[]' <<< "$DOCKER_METADATA_OUTPUT_JSON"))
+
+          echo "[debug] Docker Hub tags: ${dockerhub_tags_array[*]}"
+          echo "[debug] GHCR tags: ${ghcr_tags_array[*]}"
+          echo "[debug] Quay tags: ${quay_tags_array[*]}"
+
+          # Note: GHCR digests pushed without tags are not reliably pullable
+          echo "[info] Building digest sources from Docker Hub..."
+          dockerio_digest_sources=()
+          for digest in *; do
+            dockerio_digest_sources+=("docker.io/${{ github.repository }}@sha256:${digest}")
+          done
+          echo "[debug] Digest sources: ${dockerio_digest_sources[*]}"
+
+          # Create GHCR tags first
+          if [[ ${#ghcr_tags_array[@]} -gt 0 ]]; then
+            echo "[info] Creating GHCR tags from Docker Hub digests..."
+            for tag in "${ghcr_tags_array[@]}"; do
+              create_tag_with_retry "${tag}" "${dockerio_digest_sources[@]}"
+              sleep 1  # Small delay between tags
+            done
+          fi
+
+          # Create Quay tags second
+          if [[ ${#quay_tags_array[@]} -gt 0 ]]; then
+            echo "[info] Creating Quay tags from Docker Hub digests..."
+            for tag in "${quay_tags_array[@]}"; do
+              create_tag_with_retry "${tag}" "${dockerio_digest_sources[@]}"
+              sleep 1  # Small delay between tags
+            done
+          fi
+
+          # Create Docker Hub tags last
+          if [[ ${#dockerhub_tags_array[@]} -gt 0 ]]; then
+            echo "[info] Creating Docker Hub tags from Docker Hub digests..."
+            for tag in "${dockerhub_tags_array[@]}"; do
+              create_tag_with_retry "${tag}" "${dockerio_digest_sources[@]}"
+              sleep 1  # Small delay between tags
+            done
+          fi
