@@ -28,6 +28,9 @@ copilot-instructions.md
 # folders
 ####
 
+# ignore github instructions
+instructions/
+
 # ignore scratch folder
 .scratch/
 
