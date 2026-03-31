@@ -140,8 +140,8 @@ jobs:
           # Define registries
           registries=(
             "docker.io/${{ github.repository }}"
-            "quay.io/${{ github.repository }}"
             "ghcr.io/${{ github.repository }}"
+            "quay.io/${{ github.repository }}"
           )
 
           # Construct registry tag names, used when pushing a single arch image
@@ -348,8 +348,8 @@ jobs:
           # note 'images' format is <registry>/<owner>/<image name>
           images: |
             docker.io/${{ github.repository }}
-            quay.io/${{ github.repository }}
             ghcr.io/${{ github.repository }}
+            quay.io/${{ github.repository }}
           # note key name 'value' must be set to this for type raw
           # note we are using 'raw' type not 'semver', as not all release versions follow semver
           tags: |
@@ -435,6 +435,15 @@ jobs:
           done
           echo "[debug] Digest sources: ${dockerio_digest_sources[*]}"
 
+          # Create Docker Hub tags last
+          if [[ ${#dockerhub_tags_array[@]} -gt 0 ]]; then
+            echo "[info] Creating Docker Hub tags from Docker Hub digests..."
+            for tag in "${dockerhub_tags_array[@]}"; do
+              create_tag_with_retry "${tag}" "${dockerio_digest_sources[@]}"
+              sleep 1  # Small delay between tags
+            done
+          fi
+
           # Create GHCR tags first
           if [[ ${#ghcr_tags_array[@]} -gt 0 ]]; then
             echo "[info] Creating GHCR tags from Docker Hub digests..."
@@ -448,15 +457,6 @@ jobs:
           if [[ ${#quay_tags_array[@]} -gt 0 ]]; then
             echo "[info] Creating Quay tags from Docker Hub digests..."
             for tag in "${quay_tags_array[@]}"; do
-              create_tag_with_retry "${tag}" "${dockerio_digest_sources[@]}"
-              sleep 1  # Small delay between tags
-            done
-          fi
-
-          # Create Docker Hub tags last
-          if [[ ${#dockerhub_tags_array[@]} -gt 0 ]]; then
-            echo "[info] Creating Docker Hub tags from Docker Hub digests..."
-            for tag in "${dockerhub_tags_array[@]}"; do
               create_tag_with_retry "${tag}" "${dockerio_digest_sources[@]}"
               sleep 1  # Small delay between tags
             done
