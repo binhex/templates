@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<Container version="2">
+    <Name>binhex-caddy-duckdns</Name>
+    <Beta>false</Beta>
+    <Category>Network:Web:</Category>
+    <Repository>ghcr.io/binhex/arch-caddy-duckdns</Repository>
+    <Registry>https://github.com/binhex/arch-caddy-duckdns/pkgs/container/arch-caddy-duckdns</Registry>
+    <Network>bridge</Network>
+    <Privileged>false</Privileged>
+    <PrivilegedReq>false</PrivilegedReq>
+    <ExtraParams>--restart=unless-stopped</ExtraParams>
+    <Shell>bash</Shell>
+    <GitHub>https://github.com/binhex/arch-caddy-duckdns</GitHub>
+    <ReadMe>https://github.com/binhex/documentation</ReadMe>
+    <Support>https://forums.unraid.net/topic/THREAD/</Support>
+    <Project>https://caddyserver.com/</Project>
+    <Overview>Caddy is a powerful, enterprise-ready, open source web server with automatic HTTPS written in Go. This image includes the DuckDNS DNS challenge plugin, enabling automatic TLS certificate issuance and renewal via Let's Encrypt for DuckDNS hostnames without requiring port 80 to be open. Ideal for use as a reverse proxy on a home network.</Overview>
+    <Requires>**Caddyfile**&#10;Place your Caddyfile at '/config/caddy/Caddyfile'.</Requires>
+    <WebUI>http://[IP]:[PORT:8080]</WebUI>
+    <TemplateURL>https://raw.githubusercontent.com/binhex/templates/main/unraid/binhex/templates/caddy-duckdns.xml</TemplateURL>
+    <Icon>https://raw.githubusercontent.com/binhex/templates/main/unraid/binhex/images/caddy-duckdns-icon.png</Icon>
+    <DonateText>If you appreciate my work, then please consider buying me a beer :D</DonateText>
+    <DonateLink>https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=MM5E27UX6AUU4</DonateLink>
+    <DonateImg>https://www.paypal.com/en_US/i/btn/btn_donate_SM.gif</DonateImg>
+    <Date>2026-04-09</Date>
+    <Changes></Changes>
+
+    <Config Name="Port: HTTPS" Target="8443" Default="8443" Mode="tcp" Description="The HTTPS port Caddy listens on. Must match https_port in your Caddyfile." Type="Port" Display="always" Required="true" Mask="false"/>
+    <Config Name="Port: HTTP" Target="8080" Default="8080" Mode="tcp" Description="The HTTP port Caddy listens on (used for redirects). Must match http_port in your Caddyfile." Type="Port" Display="always" Required="false" Mask="false"/>
+    <Config Name="Port: Admin" Target="2019" Default="2019" Mode="tcp" Description="The admin edpoint port for Caddy." Type="Port" Display="always" Required="false" Mask="false"/>
+
+    <Config Name="Path: /config" Target="/config" Default="/mnt/user/appdata/caddy-duckdns" Mode="rw" Description="This is the container path to your Caddy configuration file (Caddyfile) and logs." Type="Path" Display="always" Required="true" Mask="false"/>
+
+    <Config Name="Variable: DUCKDNS_TOKEN" Target="DUCKDNS_TOKEN" Default="" Description="Duck DNS token for automatic TLS certificate issuance and renewal, sign into Duck DNS to view your token." Type="Variable" Display="always" Required="true" Mask="true"/>
+    <Config Name="Variable: ENABLE_HEALTHCHECK" Target="ENABLE_HEALTHCHECK" Default="yes|no" Description="Enable or disable healthchecks." Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Variable: HEALTHCHECK_COMMAND" Target="HEALTHCHECK_COMMAND" Default="" Description="The command or script to execute, if not specified then the script healthcheck.sh will be used (process, dns and https checking)." Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Variable: HEALTHCHECK_ACTION" Target="HEALTHCHECK_ACTION" Default="" Description="The action to execute if the healthcheck command returns a non zero exit code, if not specified the action will be 'exit 1', if you want the container to exit on failure then set the action to 'kill 1'." Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Variable: HEALTHCHECK_HOSTNAME" Target="HEALTHCHECK_HOSTNAME" Default="google.com" Description="The hostname used when performing HTTPS and DNS healthchecking." Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Variable: PUID" Target="PUID" Default="99" Description="User ID for the running container" Type="Variable" Display="advanced" Required="true" Mask="false"/>
+    <Config Name="Variable: PGID" Target="PGID" Default="100" Description="Group ID for the running container" Type="Variable" Display="advanced" Required="true" Mask="false"/>
+    <Config Name="Variable: UMASK" Target="UMASK" Default="000" Description="UMASK for the running container" Type="Variable" Display="advanced" Required="true" Mask="false"/>
+</Container>
