@@ -12,7 +12,7 @@
     <Shell>bash</Shell>
     <GitHub>https://github.com/binhex/arch-caddy-duckdns</GitHub>
     <ReadMe>https://github.com/binhex/documentation</ReadMe>
-    <Support>https://forums.unraid.net/topic/THREAD/</Support>
+    <Support>https://forums.unraid.net/topic/198200-support-binhex-caddy-duckdns/</Support>
     <Project>https://caddyserver.com/</Project>
     <Overview>Caddy is a powerful, enterprise-ready, open source web server with automatic HTTPS written in Go. This image includes the DuckDNS DNS challenge plugin, enabling automatic TLS certificate issuance and renewal via Let's Encrypt for DuckDNS hostnames without requiring port 80 to be open. Ideal for use as a reverse proxy on a home network.</Overview>
     <Requires>**Caddyfile**&#10;Place your Caddyfile at '/config/caddy/Caddyfile'.</Requires>
