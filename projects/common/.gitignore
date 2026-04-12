@@ -25,8 +25,17 @@
 # ignore copilot instructions
 copilot-instructions.md
 
+# ignore coverage files
+*coverage*
+
+# ignore all scratch related files and folders
+scratch*
+
 # folders
 ####
+
+# ignore htlm coverage folder
+htmlcov/
 
 # ignore github instructions
 instructions/
