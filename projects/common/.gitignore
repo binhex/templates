@@ -22,9 +22,6 @@
 # ignore log files
 *.log
 
-# ignore copilot instructions
-copilot-instructions.md
-
 # ignore coverage files
 *coverage*
 
@@ -34,7 +31,10 @@ scratch*
 # folders
 ####
 
-# ignore htlm coverage folder
+# ignore pr worktree folders
+pr/*/
+
+# ignore html coverage folder
 htmlcov/
 
 # ignore github instructions
