@@ -4,8 +4,8 @@ from importlib.metadata import PackageNotFoundError, version
 
 import click
 
-from core.logging import create_logger
-from utils.utils import get_project_root
+from appname.logger import create_logger
+from appname.utils import get_project_root
 
 try:
     _VERSION = version("AppName")

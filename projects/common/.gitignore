@@ -22,6 +22,8 @@
 # ignore log files
 *.log
 
+TODO.*
+
 # ignore coverage files
 *coverage*
 
