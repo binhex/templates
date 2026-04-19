@@ -22,7 +22,7 @@
 # ignore log files
 *.log
 
-TODO.*
+TODO*
 
 # ignore coverage files
 *coverage*
@@ -39,6 +39,9 @@ pr/*/
 # ignore html coverage folder
 htmlcov/
 
+# ignore docs folder that may contain copilot plans
+docs/
+
 # ignore github instructions
 instructions/
 
@@ -46,7 +49,7 @@ instructions/
 .scratch/
 
 # ignore virtual env
-.venv
+.venv*/
 
 # ignore egg info
 *.egg-info/
