@@ -33,6 +33,9 @@ scratch*
 # folders
 ####
 
+# ignore copilot generated plans
+.plans/
+
 # ignore pr worktree folders
 pr/*/
 
