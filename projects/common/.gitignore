@@ -30,6 +30,9 @@ TODO*
 # ignore all scratch related files and folders
 scratch*
 
+# ignore sqlite memory files
+:memory:
+
 # folders
 ####
 

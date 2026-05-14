@@ -1,0 +1,71 @@
+<?xml version="1.0"?>
+<Container version="2">
+    <Name>binhex-movarr</Name>
+    <Beta>false</Beta>
+    <Category>Downloaders:</Category>
+    <Repository>ghcr.io/binhex/arch-movarr</Repository>
+    <Registry>https://github.com/binhex/arch-movarr/pkgs/container/arch-movarr</Registry>
+    <Network>bridge</Network>
+    <Privileged>false</Privileged>
+    <PrivilegedReq>false</PrivilegedReq>
+    <ExtraParams>--restart=unless-stopped</ExtraParams>
+    <Shell>bash</Shell>
+    <GitHub>https://github.com/binhex/arch-movarr</GitHub>
+    <ReadMe>https://github.com/binhex/documentation</ReadMe>
+    <Support>https://forums.unraid.net/topic/THREAD/</Support>
+    <Project>https://github.com/binhex/movarr</Project>
+    <Overview>movarr is an automated movie torrent acquisition daemon. It polls Jackett or Prowlarr for movie torrents, filters results against IMDb metadata (rating, votes, year, runtime, language, genres, certification), and adds matching torrents to qBittorrent. Once a torrent completes, movarr can post-process it by copying the file to your media library. All key settings can be defined via the environment variables below, or in the movarr.yml configuration file mounted at /config.</Overview>
+    <Requires>Requires a running qBittorrent instance (binhex-qbittorrent recommended). Set MOVARR_QBT_HOST/PORT/USERNAME/PASSWORD to match.&#10;&#10;Requires either Jackett or Prowlarr as an index proxy. Set MOVARR_INDEX_PROXY to 'jackett' or 'prowlarr' and fill in the corresponding host, port, and API key variables.&#10;&#10;For post-processing (copying completed downloads to a media library), map your library path into this container and set MOVARR_LIBRARY_PATH_LIST to the container path(s).</Requires>
+    <WebUI/>
+    <TemplateURL>https://raw.githubusercontent.com/binhex/templates/main/unraid/binhex/templates/movarr.xml</TemplateURL>
+    <Icon>https://raw.githubusercontent.com/binhex/templates/main/unraid/binhex/images/movarr-icon.png</Icon>
+    <DonateText>If you appreciate my work, then please consider buying me a beer :D</DonateText>
+    <DonateLink>https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=MM5E27UX6AUU4</DonateLink>
+    <DonateImg>https://www.paypal.com/en_US/i/btn/btn_donate_SM.gif</DonateImg>
+    <Date>2026-05-07</Date>
+    <Changes></Changes>
+
+    <!-- Paths -->
+    <Config Name="Path: /config" Target="/config" Default="/mnt/user/appdata/binhex-movarr" Mode="rw" Description="Container path for movarr configuration file (movarr.yml), database, and logs." Type="Path" Display="always" Required="true" Mask="false"/>
+    <Config Name="Path: /media" Target="/media" Default="/mnt/user" Mode="rw" Description="Container path to your media library root. movarr copies completed movies here during post-processing. Set MOVARR_LIBRARY_PATH_LIST to the relevant sub-path(s) inside this mount (e.g. /media/Movies)." Type="Path" Display="always" Required="false" Mask="false"/>
+    <Config Name="Path: /data" Target="/data" Default="" Mode="rw" Description="Container path to the qBittorrent completed downloads directory. movarr reads source files from here during post-processing before calling qBittorrent to remove the torrent." Type="Path" Display="always" Required="false" Mask="false"/>
+
+    <!-- Core -->
+    <Config Name="Variable: MOVARR_DAEMON" Target="MOVARR_DAEMON" Default="yes|no" Description="Run movarr as a continuous daemon. Must be 'yes' inside a container — 'no' runs a single pass and exits." Type="Variable" Display="always" Required="true" Mask="false"/>
+    <Config Name="Variable: MOVARR_LOG_LEVEL" Target="MOVARR_LOG_LEVEL" Default="INFO|DEBUG|SUCCESS|WARNING|ERROR" Description="Console log level. Set to DEBUG when troubleshooting. Overrides general.log_level_console in movarr.yml." Type="Variable" Display="always" Required="false" Mask="false"/>
+    <Config Name="Variable: MOVARR_LIBRARY_PATH_LIST" Target="MOVARR_LIBRARY_PATH_LIST" Default="" Description="Comma-separated list of container paths to your media library. Used to detect already-owned movies and as the post-processing copy destination. Example: /media/Movies,/media/Movies-4K. Overrides general.library_path_list in movarr.yml." Type="Variable" Display="always" Required="false" Mask="false"/>
+
+    <!-- qBittorrent -->
+    <Config Name="Variable: MOVARR_QBT_HOST" Target="MOVARR_QBT_HOST" Default="localhost" Description="Hostname or IP address of the qBittorrent WebUI. If both containers share a Docker network use the container name; for host networking use 'localhost'. Overrides torrent_client.qbittorrent.host in movarr.yml." Type="Variable" Display="always" Required="true" Mask="false"/>
+    <Config Name="Variable: MOVARR_QBT_PORT" Target="MOVARR_QBT_PORT" Default="8080" Description="qBittorrent WebUI port. Overrides torrent_client.qbittorrent.port in movarr.yml." Type="Variable" Display="always" Required="true" Mask="false"/>
+    <Config Name="Variable: MOVARR_QBT_USERNAME" Target="MOVARR_QBT_USERNAME" Default="admin" Description="qBittorrent WebUI username. Overrides torrent_client.qbittorrent.username in movarr.yml." Type="Variable" Display="always" Required="true" Mask="false"/>
+    <Config Name="Variable: MOVARR_QBT_PASSWORD" Target="MOVARR_QBT_PASSWORD" Default="" Description="qBittorrent WebUI password. Overrides torrent_client.qbittorrent.password in movarr.yml." Type="Variable" Display="always" Required="true" Mask="true"/>
+
+    <!-- Index proxy selection -->
+    <Config Name="Variable: MOVARR_INDEX_PROXY" Target="MOVARR_INDEX_PROXY" Default="prowlarr|jackett" Description="Index proxy used for torrent searches. Overrides index_proxy.selected in movarr.yml." Type="Variable" Display="always" Required="true" Mask="false"/>
+
+    <!-- Jackett -->
+    <Config Name="Variable: MOVARR_JACKETT_HOST" Target="MOVARR_JACKETT_HOST" Default="localhost" Description="Hostname or IP address of the Jackett instance. Required when MOVARR_INDEX_PROXY=jackett. Overrides index_proxy.jackett.host in movarr.yml." Type="Variable" Display="always" Required="false" Mask="false"/>
+    <Config Name="Variable: MOVARR_JACKETT_PORT" Target="MOVARR_JACKETT_PORT" Default="9117" Description="Jackett port. Required when MOVARR_INDEX_PROXY=jackett. Overrides index_proxy.jackett.port in movarr.yml." Type="Variable" Display="always" Required="false" Mask="false"/>
+    <Config Name="Variable: MOVARR_JACKETT_API_KEY" Target="MOVARR_JACKETT_API_KEY" Default="" Description="Jackett API key. Required when MOVARR_INDEX_PROXY=jackett. Overrides index_proxy.jackett.api_key in movarr.yml." Type="Variable" Display="always" Required="false" Mask="true"/>
+
+    <!-- Prowlarr -->
+    <Config Name="Variable: MOVARR_PROWLARR_HOST" Target="MOVARR_PROWLARR_HOST" Default="localhost" Description="Hostname or IP address of the Prowlarr instance. Required when MOVARR_INDEX_PROXY=prowlarr. Overrides index_proxy.prowlarr.host in movarr.yml." Type="Variable" Display="always" Required="false" Mask="false"/>
+    <Config Name="Variable: MOVARR_PROWLARR_PORT" Target="MOVARR_PROWLARR_PORT" Default="9696" Description="Prowlarr port. Required when MOVARR_INDEX_PROXY=prowlarr. Overrides index_proxy.prowlarr.port in movarr.yml." Type="Variable" Display="always" Required="false" Mask="false"/>
+    <Config Name="Variable: MOVARR_PROWLARR_API_KEY" Target="MOVARR_PROWLARR_API_KEY" Default="" Description="Prowlarr API key. Required when MOVARR_INDEX_PROXY=prowlarr. Overrides index_proxy.prowlarr.api_key in movarr.yml." Type="Variable" Display="always" Required="false" Mask="true"/>
+
+    <!-- Advanced path overrides -->
+    <Config Name="Variable: MOVARR_CONFIG_PATH" Target="MOVARR_CONFIG_PATH" Default="/config/movarr/configs" Description="Path to the movarr YAML configuration file. Change only if you need the config file in a non-standard location." Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Variable: MOVARR_DB_PATH" Target="MOVARR_DB_PATH" Default="/config/movarr/db" Description="Path to the movarr SQLite history database. Overrides general.db_path in movarr.yml." Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Variable: MOVARR_LOG_PATH" Target="MOVARR_LOG_PATH" Default="/config/movarr/logs" Description="Path to the movarr log file. Leave empty to disable file logging. Overrides general.log_path in movarr.yml." Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Variable: MOVARR_PID_PATH" Target="MOVARR_PID_PATH" Default="/config/movarr/pids" Description="Path to the movarr PID file. Overrides general.pid_path in movarr.yml." Type="Variable" Display="advanced" Required="false" Mask="false"/>
+
+    <!-- Standard binhex container variables -->
+    <Config Name="Variable: ENABLE_HEALTHCHECK" Target="ENABLE_HEALTHCHECK" Default="yes|no" Description="Enable or disable healthchecks." Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Variable: HEALTHCHECK_COMMAND" Target="HEALTHCHECK_COMMAND" Default="" Description="The command or script to execute for healthchecks; defaults to healthcheck.sh if unset." Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Variable: HEALTHCHECK_ACTION" Target="HEALTHCHECK_ACTION" Default="" Description="Action to execute on healthcheck failure; defaults to 'exit 1'. Set to 'kill 1' to restart the container on failure." Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Variable: HEALTHCHECK_HOSTNAME" Target="HEALTHCHECK_HOSTNAME" Default="google.com" Description="Hostname used for DNS and HTTPS healthchecking." Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Variable: PUID" Target="PUID" Default="99" Description="User ID for the running container." Type="Variable" Display="advanced" Required="true" Mask="false"/>
+    <Config Name="Variable: PGID" Target="PGID" Default="100" Description="Group ID for the running container." Type="Variable" Display="advanced" Required="true" Mask="false"/>
+    <Config Name="Variable: UMASK" Target="UMASK" Default="000" Description="UMASK for the running container." Type="Variable" Display="advanced" Required="true" Mask="false"/>
+</Container>
