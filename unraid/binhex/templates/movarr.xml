@@ -12,7 +12,7 @@
     <Shell>bash</Shell>
     <GitHub>https://github.com/binhex/arch-movarr</GitHub>
     <ReadMe>https://github.com/binhex/documentation</ReadMe>
-    <Support>https://forums.unraid.net/topic/THREAD/</Support>
+    <Support>https://forums.unraid.net/topic/198851-support-binhex-movarr/</Support>
     <Project>https://github.com/binhex/movarr</Project>
     <Overview>movarr is an automated movie torrent acquisition daemon. It polls Jackett or Prowlarr for movie torrents, filters results against IMDb metadata (rating, votes, year, runtime, language, genres, certification), and adds matching torrents to qBittorrent. Once a torrent completes, movarr can post-process it by copying the file to your media library. All key settings can be defined via the environment variables below, or in the movarr.yml configuration file mounted at /config.</Overview>
     <Requires>Requires a running qBittorrent instance (binhex-qbittorrent recommended). Set MOVARR_QBT_HOST/PORT/USERNAME/PASSWORD to match.&#10;&#10;Requires either Jackett or Prowlarr as an index proxy. Set MOVARR_INDEX_PROXY to 'jackett' or 'prowlarr' and fill in the corresponding host, port, and API key variables.&#10;&#10;For post-processing (copying completed downloads to a media library), map your library path into this container and set MOVARR_LIBRARY_PATH_LIST to the container path(s).&#10;&#10;IMPORTANT - Please ensure you edit /config/movarr/config/movarr.yml after the initial startup.</Requires>
