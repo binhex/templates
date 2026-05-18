@@ -61,6 +61,7 @@
     <Config Name="Variable: MOVARR_PID_PATH" Target="MOVARR_PID_PATH" Default="/config/movarr/pids" Description="Path to the movarr PID file. Overrides general.pid_path in movarr.yml." Type="Variable" Display="advanced" Required="false" Mask="false"/>
 
     <!-- Standard binhex container variables -->
+    <Config Name="Variable: ENABLE_STARTUP_SCRIPTS" Target="ENABLE_STARTUP_SCRIPTS" Default="no|yes" Description="Specify whether to run startup scripts to install and/or configure additional applications." Type="Variable" Display="always" Required="false" Mask="false"/>
     <Config Name="Variable: ENABLE_HEALTHCHECK" Target="ENABLE_HEALTHCHECK" Default="yes|no" Description="Enable or disable healthchecks." Type="Variable" Display="advanced" Required="false" Mask="false"/>
     <Config Name="Variable: HEALTHCHECK_COMMAND" Target="HEALTHCHECK_COMMAND" Default="" Description="The command or script to execute for healthchecks; defaults to healthcheck.sh if unset." Type="Variable" Display="advanced" Required="false" Mask="false"/>
     <Config Name="Variable: HEALTHCHECK_ACTION" Target="HEALTHCHECK_ACTION" Default="" Description="Action to execute on healthcheck failure; defaults to 'exit 1'. Set to 'kill 1' to restart the container on failure." Type="Variable" Display="advanced" Required="false" Mask="false"/>
