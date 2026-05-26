@@ -46,7 +46,7 @@ pr/*/
 htmlcov/
 
 # ignore docs folder that may contain copilot plans
-docs/
+docs/superpowers/*
 
 # ignore github instructions
 instructions/
