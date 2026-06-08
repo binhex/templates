@@ -10,8 +10,11 @@
 # ignore vscode ide
 .vscode
 
+# ignore coverage files
+*coverage*
+
 # ignore test coverage files
-.coverage
+*cover
 
 # ignore compiled python scripts
 *.py[cod]
@@ -23,9 +26,6 @@
 *.log
 
 TODO*
-
-# ignore coverage files
-*coverage*
 
 # ignore all scratch related files and folders
 scratch*
