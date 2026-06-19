@@ -32,7 +32,7 @@
 
     <!-- Core -->
     <Config Name="Variable: MOVARR_LOG_LEVEL" Target="MOVARR_LOG_LEVEL" Default="INFO|DEBUG|SUCCESS|WARNING|ERROR" Description="Console log level. Set to DEBUG when troubleshooting. Overrides general.log_level_console in movarr.yml." Type="Variable" Display="always" Required="false" Mask="false"/>
-    <Config Name="Variable: MOVARR_LIBRARY_PATH_LIST" Target="MOVARR_LIBRARY_PATH_LIST" Default="" Description="Comma-separated list of container paths to your media library. Used to detect already-owned movies and as the post-processing copy destination. Example: /media/Movies,/media/Movies-4K. Overrides general.library_path_list in movarr.yml." Type="Variable" Display="always" Required="false" Mask="false"/>
+    <Config Name="Variable: MOVARR_LIBRARY_PATH" Target="MOVARR_LIBRARY_PATH" Default="" Description="Comma-separated list of container paths to your media library. Used to detect already-owned movies and as the post-processing copy destination. Example: /media/Movies,/media/Movies-4K. Overrides general.library_path_list in movarr.yml." Type="Variable" Display="always" Required="false" Mask="false"/>
 
     <!-- qBittorrent -->
     <Config Name="Variable: MOVARR_QBT_HOST" Target="MOVARR_QBT_HOST" Default="localhost" Description="Hostname or IP address of the qBittorrent WebUI. If both containers share a Docker network use the container name; for host networking use 'localhost'. Overrides torrent_client.qbittorrent.host in movarr.yml." Type="Variable" Display="always" Required="true" Mask="false"/>
