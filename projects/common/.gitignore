@@ -2,10 +2,13 @@
 ####
 
 # ignore coverage files
-*coverage*
+.coverage*
 
 # ignore test coverage files
-*cover
+cover.*
+
+# ignore coverage generated report files
+coverage.xml
 
 # ignore compiled python scripts
 *.py[cod]
@@ -29,9 +32,6 @@ scratch*
 
 # ignore all dot folders
 .*/
-
-# ignore all dot folders except .github
-!.github/
 
 # ai skills folders
 *superpowers/
@@ -66,3 +66,11 @@ instructions/
 # ignore python cache folders
 __pycache__/
 
+# overrides (excludes)
+####
+
+# ignore all dot folders except .github
+!.github/
+
+# exclude test data coverage folder from being ignored (nocrap)
+!internal/coverage/
