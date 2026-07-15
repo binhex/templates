@@ -1,9 +1,6 @@
 # files
 ####
 
-# ignore coverage files
-.coverage*
-
 # ignore test coverage files
 cover.*
 
@@ -26,6 +23,9 @@ scratch*
 
 # ignore sqlite memory files
 :memory:
+
+# ignore all dot files
+.*
 
 # folders
 ####
@@ -74,3 +74,9 @@ __pycache__/
 
 # exclude test data coverage folder from being ignored (nocrap)
 !internal/coverage/
+
+# exclude .gitignore files
+!.gitignore
+
+# exclude .pre-commit-config.yaml files
+!.pre-commit-config.yaml
