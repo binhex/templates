@@ -33,9 +33,6 @@ scratch*
 # ignore all dot folders
 .*/
 
-# ai skills folders
-*superpowers/
-
 # temporary folders
 temp/
 
@@ -53,9 +50,6 @@ pr/*/
 
 # ignore html coverage folder
 htmlcov/
-
-# ignore docs folder that may contain copilot plans folders
-docs/superpowers/*
 
 # ignore github instructions folders
 instructions/
