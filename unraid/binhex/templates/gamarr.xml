@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<Container version="2">
+    <Name>binhex-gamarr</Name>
+    <Beta>false</Beta>
+    <Category>Downloaders:</Category>
+    <Repository>ghcr.io/binhex/arch-gamarr</Repository>
+    <Registry>https://github.com/binhex/arch-gamarr/pkgs/container/arch-gamarr</Registry>
+    <Network>bridge</Network>
+    <Privileged>false</Privileged>
+    <PrivilegedReq>false</PrivilegedReq>
+    <ExtraParams>--restart=unless-stopped</ExtraParams>
+    <Shell>bash</Shell>
+    <GitHub>https://github.com/binhex/arch-gamarr</GitHub>
+    <ReadMe>https://github.com/binhex/documentation</ReadMe>
+    <Support>https://forums.unraid.net/topic/198851-support-binhex-gamarr/</Support>
+    <Project>https://github.com/binhex/gamarr</Project>
+    <Overview>gamarr finds great games and puts them in your library — no browsing, no manual searches, no cleanup. A configurable pipeline scrapes Metacritic for critically-acclaimed releases, filters out unwanted genres and keywords, matches titles against FitGirl repacks and FreeGOGPCGames, and delivers torrents to qBittorrent. Once downloads complete, a post-processing thread SHA-256-verifies and copies each game to your library with customizable path templates, then cleans up source torrents. Runs as a daemon so your library stays fresh without lifting a finger.</Overview>
+    <Requires>Requires a running qBittorrent instance (binhex-qbittorrent recommended). Set GAMARR_QBT_HOST/PORT/USERNAME/PASSWORD to match.&#10;&#10;For post-processing (copying completed downloads to a media library), map your library path into this container and set GAMARR_LIBRARY_PATH to the container path(s).&#10;&#10;IMPORTANT - Please ensure you edit /config/gamarr/config/gamarr.yml after the initial startup.</Requires>
+    <WebUI/>
+    <TemplateURL>https://raw.githubusercontent.com/binhex/templates/main/unraid/binhex/templates/gamarr.xml</TemplateURL>
+    <Icon>https://raw.githubusercontent.com/binhex/templates/main/unraid/binhex/images/gamarr-icon.png</Icon>
+    <DonateText>If you appreciate my work, then please consider buying me a beer :D</DonateText>
+    <DonateLink>https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=MM5E27UX6AUU4</DonateLink>
+    <DonateImg>https://www.paypal.com/en_US/i/btn/btn_donate_SM.gif</DonateImg>
+    <RemoveFromCA>true</RemoveFromCA><!-- REMOVE THIS LINE -->
+    <Date>2026-05-07</Date>
+    <Changes></Changes>
+
+    <!-- Paths -->
+    <Config Name="Path: /config" Target="/config" Default="/mnt/user/appdata/binhex-gamarr" Mode="rw" Description="Container path for gamarr configuration file (gamarr.yml), database, and logs." Type="Path" Display="always" Required="true" Mask="false"/>
+    <Config Name="Path: /media" Target="/media" Default="/mnt/user" Mode="rw" Description="Container path to your media library root. gamarr copies completed games here during post-processing. Set GAMARR_LIBRARY_PATH to the relevant sub-path(s) inside this mount (e.g. /media/Games)." Type="Path" Display="always" Required="false" Mask="false"/>
+    <Config Name="Path: /data" Target="/data" Default="" Mode="rw" Description="Container path to the qBittorrent completed downloads directory. gamarr reads source files from here during post-processing before calling qBittorrent to remove the torrent." Type="Path" Display="always" Required="false" Mask="false"/>
+
+    <!-- Core -->
+    <Config Name="Variable: GAMARR_LOG_LEVEL" Target="GAMARR_LOG_LEVEL" Default="INFO|DEBUG|SUCCESS|WARNING|ERROR" Description="Console log level. Set to DEBUG when troubleshooting. Overrides general.log_level_console in gamarr.yml." Type="Variable" Display="always" Required="false" Mask="false"/>
+    <Config Name="Variable: GAMARR_LIBRARY_PATH" Target="GAMARR_LIBRARY_PATH" Default="" Description="Comma-separated list of container paths to your media library. Used to detect already-owned games and as the post-processing copy destination. Example: /media/Games,/media/Games-4K. Overrides general.library_path_list in gamarr.yml." Type="Variable" Display="always" Required="false" Mask="false"/>
+
+    <!-- qBittorrent -->
+    <Config Name="Variable: GAMARR_QBT_HOST" Target="GAMARR_QBT_HOST" Default="localhost" Description="Hostname or IP address of the qBittorrent WebUI. If both containers share a Docker network use the container name; for host networking use 'localhost'. Overrides torrent_client.qbittorrent.host in gamarr.yml." Type="Variable" Display="always" Required="true" Mask="false"/>
+    <Config Name="Variable: GAMARR_QBT_PORT" Target="GAMARR_QBT_PORT" Default="8080" Description="qBittorrent WebUI port. Overrides torrent_client.qbittorrent.port in gamarr.yml." Type="Variable" Display="always" Required="true" Mask="false"/>
+    <Config Name="Variable: GAMARR_QBT_USERNAME" Target="GAMARR_QBT_USERNAME" Default="admin" Description="qBittorrent WebUI username. Overrides torrent_client.qbittorrent.username in gamarr.yml." Type="Variable" Display="always" Required="true" Mask="false"/>
+    <Config Name="Variable: GAMARR_QBT_PASSWORD" Target="GAMARR_QBT_PASSWORD" Default="" Description="qBittorrent WebUI password. Overrides torrent_client.qbittorrent.password in gamarr.yml." Type="Variable" Display="always" Required="true" Mask="true"/>
+
+    <!-- Advanced path overrides -->
+    <Config Name="Variable: GAMARR_CONFIG_PATH" Target="GAMARR_CONFIG_PATH" Default="/config/gamarr/configs" Description="Path to the gamarr YAML configuration file. Change only if you need the config file in a non-standard location." Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Variable: GAMARR_DB_PATH" Target="GAMARR_DB_PATH" Default="/config/gamarr/db" Description="Path to the gamarr SQLite history database. Overrides general.db_path in gamarr.yml." Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Variable: GAMARR_LOG_PATH" Target="GAMARR_LOG_PATH" Default="/config/gamarr/logs" Description="Path to the gamarr log file. Leave empty to disable file logging. Overrides general.log_path in gamarr.yml." Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Variable: GAMARR_PID_PATH" Target="GAMARR_PID_PATH" Default="/config/gamarr/pids" Description="Path to the gamarr PID file. Overrides general.pid_path in gamarr.yml." Type="Variable" Display="advanced" Required="false" Mask="false"/>
+
+    <!-- Standard binhex container variables -->
+    <Config Name="Variable: ENABLE_STARTUP_SCRIPTS" Target="ENABLE_STARTUP_SCRIPTS" Default="no|yes" Description="Specify whether to run startup scripts to install and/or configure additional applications." Type="Variable" Display="always" Required="false" Mask="false"/>
+    <Config Name="Variable: ENABLE_HEALTHCHECK" Target="ENABLE_HEALTHCHECK" Default="yes|no" Description="Enable or disable healthchecks." Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Variable: HEALTHCHECK_COMMAND" Target="HEALTHCHECK_COMMAND" Default="" Description="The command or script to execute for healthchecks; defaults to healthcheck.sh if unset." Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Variable: HEALTHCHECK_ACTION" Target="HEALTHCHECK_ACTION" Default="" Description="Action to execute on healthcheck failure; defaults to 'exit 1'. Set to 'kill 1' to restart the container on failure." Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Variable: HEALTHCHECK_HOSTNAME" Target="HEALTHCHECK_HOSTNAME" Default="google.com" Description="Hostname used for DNS and HTTPS healthchecking." Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Variable: PUID" Target="PUID" Default="99" Description="User ID for the running container." Type="Variable" Display="advanced" Required="true" Mask="false"/>
+    <Config Name="Variable: PGID" Target="PGID" Default="100" Description="Group ID for the running container." Type="Variable" Display="advanced" Required="true" Mask="false"/>
+    <Config Name="Variable: UMASK" Target="UMASK" Default="000" Description="UMASK for the running container." Type="Variable" Display="advanced" Required="true" Mask="false"/>
+</Container>
