@@ -39,12 +39,6 @@ temp/
 # temporary folders
 tmp/
 
-# ignore copilot generated plans folders
-*plans/
-
-# ignore copilot generated specs folders
-*specs/
-
 # ignore pr worktree folders
 pr/*/
 
@@ -63,14 +57,17 @@ __pycache__/
 # overrides (excludes)
 ####
 
-# ignore all dot folders except .github
+# overrides ignore for all dot folders except .github
 !.github/
 
-# exclude test data coverage folder from being ignored (nocrap)
+# overrides ignore for test data coverage folder from being ignored (nocrap)
 !internal/coverage/
 
-# exclude .gitignore files
+# overrides ignore for .gitignore files
 !.gitignore
 
-# exclude .pre-commit-config.yaml files
+# overrides ignore for pre-commit-config.yaml files
 !.pre-commit-config.yaml
+
+# overrides ignore for circleci folder
+!.circleci/
