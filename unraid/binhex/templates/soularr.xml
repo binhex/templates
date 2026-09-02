@@ -12,7 +12,7 @@
     <Shell>bash</Shell>
     <GitHub>https://github.com/binhex/arch-soularr</GitHub>
     <ReadMe>https://github.com/binhex/documentation</ReadMe>
-    <Support>https://forums.unraid.net/topic/index.php?topic=152959.0/</Support>
+    <Support>https://forums.unraid.net/topic/XXXXX-support-binhex-soularr</Support>
     <Project>https://github.com/mrusse/soularr</Project>
     <Overview>Soularr is a Python application that automates music downloads from Soulseek for Lidarr. It monitors Lidarr for wanted albums and searches Soulseek to download them, providing seamless integration between your music collection manager and the Soulseek network.</Overview>
     <WebUI></WebUI>

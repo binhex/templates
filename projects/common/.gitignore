@@ -39,6 +39,9 @@ temp/
 # temporary folders
 tmp/
 
+# ignore build folders
+target/
+
 # ignore pr worktree folders
 pr/*/
 

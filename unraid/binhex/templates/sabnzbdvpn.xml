@@ -12,7 +12,7 @@
     <Shell>bash</Shell>
     <GitHub>https://github.com/binhex/arch-sabnzbdvpn</GitHub>
     <ReadMe>https://github.com/binhex/documentation</ReadMe>
-    <Support>http://forums.unraid.net/index.php?topic=45822.0</Support>
+    <Support>https://forums.unraid.net/topic/44119-support-binhex-sabnzbdvpn</Support>
     <Project>http://sabnzbd.org/</Project>
     <Overview>SABnzbd is an Open Source Binary Newsreader written in Python. It's totally free, incredibly easy to use, and works practically everywhere. SABnzbd makes Usenet as simple and streamlined as possible by automating everything we can. All you have to do is add an .nzb. This Docker includes OpenVPN and WireGuard to ensure a secure and private connection to the Internet, including use of iptables to prevent IP leakage when the tunnel is down. It also includes Privoxy to allow unfiltered access to index sites, to use Privoxy please point your application at "http://host ip:8118".</Overview>
     <WebUI>http://[IP]:[PORT:8080]</WebUI>

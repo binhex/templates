@@ -12,7 +12,7 @@
     <Shell>bash</Shell>
     <GitHub>https://github.com/binhex/arch-radarr</GitHub>
     <ReadMe>https://github.com/binhex/documentation</ReadMe>
-    <Support>https://forums.unraid.net/topic/index.php?topic=55549.0/</Support>
+    <Support>https://forums.unraid.net/topic/53807-support-binhex-radarr</Support>
     <Project>https://github.com/Radarr/Radarr</Project>
     <Overview>Radarr is a free and open-source movie collection manager. It is actually a fork of Sonarr but for movies— similar to what Couchpotato does. Radarr automatically monitors multiple RSS feeds for new movies and interfaces with Usenet and BitTorrent clients to grab, sort, and rename them. It supports automatic upgrading of the quality of existing files and features full integration with popular download clients and media servers.</Overview>
     <WebUI>http://[IP]:[PORT:7878]</WebUI>

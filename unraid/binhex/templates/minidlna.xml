@@ -12,7 +12,7 @@
     <Shell>bash</Shell>
     <GitHub>https://github.com/binhex/arch-minidlna</GitHub>
     <ReadMe>https://github.com/binhex/documentation</ReadMe>
-    <Support>https://forums.unraid.net/topic/index.php?topic=45841.0/</Support>
+    <Support>https://forums.unraid.net/topic/44138-support-binhex-minidlna</Support>
     <Project>http://sourceforge.net/projects/minidlna/</Project>
     <Overview>ReadyMedia (formerly known as MiniDLNA) is a simple media server software, with the aim of being fully compliant with DLNA/UPnP-AV clients. It is developed by a NETGEAR employee for the ReadyNAS product line.</Overview>
     <WebUI></WebUI>
