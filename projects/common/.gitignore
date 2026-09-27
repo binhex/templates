@@ -60,17 +60,13 @@ __pycache__/
 # overrides (excludes)
 ####
 
-# overrides ignore for all dot folders except .github
-!.github/
-
-# overrides ignore for test data coverage folder from being ignored (nocrap)
-!internal/coverage/
-
-# overrides ignore for .gitignore files
+# overrides ignore for all dot folders except these files
 !.gitignore
-
-# overrides ignore for pre-commit-config.yaml files
 !.pre-commit-config.yaml
 
-# overrides ignore for circleci folder
+# overrides ignore for all dot folders except these folders
+!.git/
+!.github/
+!internal/coverage/
 !.circleci/
+!.plugin/

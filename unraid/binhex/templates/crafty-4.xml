@@ -14,7 +14,7 @@
     <Support>https://forums.unraid.net/topic/124948-support-binhex-crafty-4/</Support>
     <Project>https://https://craftycontrol.com/</Project>
     <Overview>Crafty Controller is a free and open-source Minecraft launcher and manager that allows users to start and administer Minecraft servers from a user-friendly interface. The interface is run as a self-hosted web server that is accessible to devices on the local network by default and can be port forwarded to provide external access outside of your local network. Crafty is designed to be easy to install and use, requiring only a bit of technical knowledge and a desire to learn to get started. Crafty Controller is still actively being developed by Arcadia Technology and we are continually making major improvements to the software.</Overview>
-    <WebUI>http://[IP]:[PORT:8443]</WebUI>
+    <WebUI>https://[IP]:[PORT:8443]</WebUI>
     <TemplateURL>https://raw.githubusercontent.com/binhex/templates/main/unraid/binhex/templates/crafty-4.xml</TemplateURL>
     <Icon>https://raw.githubusercontent.com/binhex/templates/main/unraid/binhex/images/crafty-4-icon.png</Icon>
     <DonateText>If you appreciate my work, then please consider buying me a beer :D</DonateText>
@@ -22,7 +22,6 @@
     <DonateImg>https://www.paypal.com/en_US/i/btn/btn_donate_SM.gif</DonateImg>
     <Date>1970-01-01</Date>
     <Changes></Changes>
-    <Config Name="Port: Web Interface (HTTP)" Target="8000" Default="8000" Mode="tcp" Description="This is the HTTP Web UI port for for the application." Type="Port" Display="always" Required="true" Mask="false"/>
     <Config Name="Port: Web Interface (HTTPS)" Target="8443" Default="8443" Mode="tcp" Description="This is the HTTPS Web UI port for for the application." Type="Port" Display="always" Required="true" Mask="false"/>
     <Config Name="Port: Minecraft Bedrock servers (TCP)" Target="19132-19232" Default="19132-19232" Mode="tcp" Description="This is the TCP port range for Minecrasft Bedrock servers." Type="Port" Display="always" Required="true" Mask="false"/>
     <Config Name="Port: Minecraft Bedrock servers (UDP)" Target="19132-19232" Default="19132-19232" Mode="udp" Description="This is the UDP port range for Minecrasft Bedrock servers." Type="Port" Display="always" Required="true" Mask="false"/>
