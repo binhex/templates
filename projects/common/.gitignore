@@ -57,12 +57,29 @@ instructions/
 # ignore python cache folders
 __pycache__/
 
+# credentials and secret material must never be committed
+*.env
+.env*
+*.token
+*.pat
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+secrets/
+secrets.env
+
 # overrides (excludes)
 ####
 
 # overrides ignore for all dot folders except these files
 !.gitignore
 !.pre-commit-config.yaml
+!.gitleaks.toml
+!.env.example
+!.env.sample
+!.env.template
 
 # overrides ignore for all dot folders except these folders
 !.git/
