@@ -1,6 +1,17 @@
 # files
 ####
 
+# credentials and secrets
+*.env
+.env*
+*.token
+*.pat
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+
 # ignore test coverage files
 cover.*
 
@@ -57,23 +68,15 @@ instructions/
 # ignore python cache folders
 __pycache__/
 
-# credentials and secret material must never be committed
-*.env
-.env*
-*.token
-*.pat
-*.pem
-*.key
-*.p12
-*.pfx
-*.crt
+# ignore secrets folders
 secrets/
-secrets.env
 
-# overrides (excludes)
+# overrides (forced includes)
 ####
 
-# overrides ignore for all dot folders except these files
+# files
+####
+
 !.gitignore
 !.pre-commit-config.yaml
 !.gitleaks.toml
@@ -81,9 +84,12 @@ secrets.env
 !.env.sample
 !.env.template
 
-# overrides ignore for all dot folders except these folders
+# folders
+####
+
 !.git/
 !.github/
 !internal/coverage/
 !.circleci/
 !.plugin/
+!.claude-plugin/
