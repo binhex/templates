@@ -490,8 +490,8 @@ ls -l /tmp/fbq-icon/official-filebrowser-quantum-icon.png
 file /tmp/fbq-icon/official-filebrowser-quantum-icon.png
 ```
 
-Expected: a PNG of roughly 30 KB reported as `PNG image data, 256 x 256` (planning measured 33 087 bytes for the
-in-repo source file at `frontend/public/img/icons/favicon.png`; the raw URL may serve the same bytes).
+Expected: a PNG of about 9 KB reported as `PNG image data, 256 x 256` (measured 9 334 bytes; the sparse-checkout
+copy at `frontend/public/img/icons/favicon.png` is byte-identical to the raw URL, confirmed by `cmp`).
 
 If that URL 404s, fall back to the pinned revision
 `https://raw.githubusercontent.com/gtsteffaniak/filebrowser/91bc608f0ec6a3246c29e5fc87acdd46a5fadf44/frontend/public/img/icons/favicon.png`,
