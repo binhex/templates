@@ -35,7 +35,9 @@ from documentation.
 
 Derived from an upstream checkout (`git clone --depth 1 --filter=blob:none --sparse`,
 `git sparse-checkout set server docker`) by grepping `os.Getenv` and `defaultValue(..., "ENV")` under
-`server/`. Twenty names are read; seventeen are exposed.
+`server/`. Twenty-three names are read; eighteen are exposed. Three are deliberate omissions
+(`FILESTASH_PORT`, `FILESTASH_PATH`, `LICENSE`) and two (`HOME`, `PATH`) are environment fundamentals rather
+than application settings, so they are filtered out.
 
 Image facts confirmed from `docker/Dockerfile`: `CMD ["/app/filestash"]`, `EXPOSE 8334`,
 `USER filestash`, and all state rooted at `/app/data` (`state/config`, `state/certs`, `state/db`,
@@ -109,6 +111,7 @@ so ordering encodes the upstream default.
 | `DROPBOX_CLIENT_ID` | (blank) | `advanced` | false | Dropbox OAuth app client id |
 | `LOCAL_BACKEND_SECRET` | (blank) | `advanced` | true | Secret for the local-storage backend |
 | `PLG_AUTHENTICATE_LOCAL_ENABLED` | `false\|true` | `advanced` | false | Enables the local authentication plugin |
+| `FEATURE_TRANSCODING_VIDEO_BLACKLIST` | (blank) | `advanced` | false | Video formats that will not be transcoded; feature flag default for the on-demand transcoder, normally set in `/admin` |
 
 Every `Config` uses `Name="<Kind>: <LABEL>"` (for example `Variable: APPLICATION_URL`) to match the
 existing templates. Only the port and appdata path are `Required="true"`; every variable is
@@ -126,6 +129,10 @@ are that list. Nothing in this document contains an unescaped table pipe.
 | `LICENSE` | Read-only display constant in the admin UI, not a user setting. |
 | `CANARY` | Present in the upstream compose file but unreferenced by the current source. Excluded as a no-op. |
 
+`HOME` and `PATH` are also read by the binary but are environment fundamentals, not user settings, so they are
+not template entries. `FEATURE_TRANSCODING_VIDEO_BLACKLIST` is **not** in this table: it is read by
+`server/plugin/plg_video_transcoder/config.go` (via `os.Getenv`) and is exposed as the eighteenth variable.
+
 ## Non-goals
 
 - No `official-collabora.xml` companion template (office editing is opt-in through `OFFICE_*`).
@@ -139,15 +146,17 @@ are that list. Nothing in this document contains an unescaped table pipe.
 Implementation is complete only when all of the following pass:
 
 1. The XML parses (Python `xml.etree` or `xmllint --noout`).
-2. All 17 variable targets are present exactly once, with no duplicate `Target` values across the file.
+2. All 18 variable targets are present exactly once, with no duplicate `Target` values across the file.
 3. Every pipe-separated `Default` begins with the documented upstream default.
 4. `Required`, `Mask` and `Display` values are limited to `true|false` and `always|advanced`.
 5. The target list matches a grep of the upstream source checkout (`server/pkg/config/config.go`,
    `server/pkg/config/config_state.go`, `server/pkg/env/constants.go`, `server/plugin/plg_editor_wopi`,
    `server/plugin/plg_editor_onlyoffice`, `server/plugin/plg_handler_syncthing`,
-   `server/plugin/plg_backend_gdrive`, `server/plugin/plg_backend_dropbox`,
-   `server/plugin/plg_backend_local`, `server/plugin/plg_authenticate_local`, `server/plugin/plg_license`),
-   with `FILESTASH_PORT`, `FILESTASH_PATH` and `LICENSE` accounted for as the three deliberate omissions.
+   `server/plugin/plg_video_transcoder`, `server/plugin/plg_backend_gdrive`,
+   `server/plugin/plg_backend_dropbox`, `server/plugin/plg_backend_local`,
+   `server/plugin/plg_authenticate_local`, `server/plugin/plg_license`),
+   with `FILESTASH_PORT`, `FILESTASH_PATH` and `LICENSE` accounted for as the three deliberate omissions and
+   `HOME` / `PATH` filtered as environment fundamentals.
    `CANARY` is not one of them: the current source never reads it.
 6. `TemplateURL` and `Icon` filenames match the committed paths, and `unraid/binhex/images/official-filestash-icon.png`
    exists and is a valid PNG.

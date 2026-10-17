@@ -83,6 +83,7 @@ secrets/
 !.env.example
 !.env.sample
 !.env.template
+!.markdownlint.json
 
 # folders
 ####
