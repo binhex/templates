@@ -15,7 +15,7 @@
     <Support>https://forums.unraid.net/topic/197257-support-binhex-file-browser/</Support>
     <Project>https://github.com/gtsteffaniak/filebrowser</Project>
     <Overview>File Browser provides a file managing interface within a specified directory and it can be used to upload, delete, preview and edit your files. It is a create-your-own-cloud-kind of software where you can just install it on your server, direct it to a path and access your files through a nice web interface.</Overview>
-    <Requires>**Default authentication**&#10;Username: admin&#10;Password: filebrowser-quantum&#10;&#10;**Important**: Please ensure you change the default password after first login, you can do this through the web interface.</Requires>
+    <Requires>**Default authentication**&#10;Username: admin&#10;Password: randomly generated on first start and written to /config/filebrowser/logs/filebrowser.log&#10;&#10;**Important**: Please change the password at first login, you can do this through the web interface.</Requires>
     <WebUI>http://[IP]:[PORT:8125]</WebUI>
     <TemplateURL>https://raw.githubusercontent.com/binhex/templates/main/unraid/binhex/templates/filebrowser-quantum.xml</TemplateURL>
     <Icon>https://raw.githubusercontent.com/binhex/templates/main/unraid/binhex/images/filebrowser-quantum-icon.png</Icon>
@@ -29,7 +29,7 @@
     <Config Name="Path: /config" Target="/config" Default="/mnt/user/appdata/filebrowser-quantum" Mode="rw" Description="This is the container path to your configuration files, e.g. databases, configuration files, logs etc." Type="Path" Display="always" Required="true" Mask="false"/>
     <Config Name="Path: /media" Target="/media" Default="/mnt/user" Mode="rw" Description="This is the container path to your media files, e.g. movies, tv, music, pictures etc." Type="Path" Display="always" Required="false" Mask="false"/>
 
-    <Config Name="Variable: FILEBROWSER_ADMIN_PASSWORD" Target="FILEBROWSER_ADMIN_PASSWORD" Default="" Description="Admin password. Leave blank to keep the upstream behaviour: a random admin password is generated, written to the container log once, and a reset is forced at first login." Type="Variable" Display="always" Required="false" Mask="true"/>
+    <Config Name="Variable: FILEBROWSER_ADMIN_PASSWORD" Target="FILEBROWSER_ADMIN_PASSWORD" Default="" Description="Admin password. Leave blank to keep the upstream behaviour: a random admin password is generated, written to /config/filebrowser/logs/filebrowser.log once, and a reset is forced at first login." Type="Variable" Display="always" Required="false" Mask="true"/>
 
     <Config Name="Variable: FILEBROWSER_JWT_TOKEN_SECRET" Target="FILEBROWSER_JWT_TOKEN_SECRET" Default="" Description="Secret used to sign JWT authentication tokens. Changing it after first start invalidates all existing sessions." Type="Variable" Display="advanced" Required="false" Mask="true"/>
     <Config Name="Variable: FILEBROWSER_TOTP_SECRET" Target="FILEBROWSER_TOTP_SECRET" Default="" Description="Encryption secret for stored TOTP two-factor secrets. Set it before enrolling users in TOTP." Type="Variable" Display="advanced" Required="false" Mask="true"/>
@@ -41,9 +41,9 @@
     <Config Name="Variable: FILEBROWSER_ONLYOFFICE_SECRET" Target="FILEBROWSER_ONLYOFFICE_SECRET" Default="" Description="JWT secret shared with your OnlyOffice document server." Type="Variable" Display="advanced" Required="false" Mask="true"/>
     <Config Name="Variable: FILEBROWSER_DISABLE_AUTOMATIC_BACKUP" Target="FILEBROWSER_DISABLE_AUTOMATIC_BACKUP" Default="false|true" Description="Automatic backups are on by default. Set this to true to disable the backup taken automatically before an upgrade." Type="Variable" Display="advanced" Required="false" Mask="false"/>
 
-    <Config Name="Variable: FILEBROWSER_CONFIG" Target="FILEBROWSER_CONFIG" Default="/config/filebrowser/config/config.yaml" Description="Path to the configuration file." Type="Variable" Display="advanced" Required="true" Mask="false"/>
-    <Config Name="Variable: FILEBROWSER_DATABASE_PATH" Target="FILEBROWSER_DATABASE_PATH" Default="/config/filebrowser/db/filebrowser.sqlite" Description="Path to the SQLite database." Type="Variable" Display="advanced" Required="true" Mask="false"/>
-    <Config Name="Variable: FILEBROWSER_FFMPEG_PATH" Target="FILEBROWSER_FFMPEG_PATH" Default="/usr/local/bin" Description="Directory holding the ffmpeg and ffprobe binaries." Type="Variable" Display="advanced" Required="true" Mask="false"/>
+    <Config Name="Variable: FILEBROWSER_CONFIG" Target="FILEBROWSER_CONFIG" Default="/config/filebrowser/config/config.yaml" Description="Path to the configuration file. The default config is seeded here on first start when the file is absent." Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Variable: FILEBROWSER_DATABASE_PATH" Target="FILEBROWSER_DATABASE_PATH" Default="/config/filebrowser/db/filebrowser.sqlite" Description="Path to the SQLite database." Type="Variable" Display="advanced" Required="false" Mask="false"/>
+    <Config Name="Variable: FILEBROWSER_FFMPEG_PATH" Target="FILEBROWSER_FFMPEG_PATH" Default="/usr/local/bin" Description="Directory holding the ffmpeg and ffprobe binaries." Type="Variable" Display="advanced" Required="false" Mask="false"/>
 
     <Config Name="Variable: ADDITIONAL_PARAMETERS" Target="ADDITIONAL_PARAMETERS" Default="" Description="Additional parameters to pass to the File Browser cli" Type="Variable" Display="advanced" Required="false" Mask="false"/>
     <Config Name="Variable: ENABLE_HEALTHCHECK" Target="ENABLE_HEALTHCHECK" Default="yes|no" Description="Enable or disable healthchecks." Type="Variable" Display="advanced" Required="false" Mask="false"/>
