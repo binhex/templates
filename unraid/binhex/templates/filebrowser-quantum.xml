@@ -12,7 +12,7 @@
     <Shell>bash</Shell>
     <GitHub>https://github.com/binhex/arch-filebrowser-quantum</GitHub>
     <ReadMe>https://github.com/binhex/documentation</ReadMe>
-    <Support>https://forums.unraid.net/topic/197257-support-binhex-file-browser/</Support>
+    <Support>https://forums.unraid.net/topic/201068-support-binhex-filebrowser-quantum/</Support>
     <Project>https://github.com/gtsteffaniak/filebrowser</Project>
     <Overview>File Browser provides a file managing interface within a specified directory and it can be used to upload, delete, preview and edit your files. It is a create-your-own-cloud-kind of software where you can just install it on your server, direct it to a path and access your files through a nice web interface.</Overview>
     <Requires>**Default authentication**&#10;Username: admin&#10;Password: randomly generated on first start and written to /config/filebrowser/logs/filebrowser.log&#10;&#10;**Important**: Please change the password at first login, you can do this through the web interface.</Requires>
